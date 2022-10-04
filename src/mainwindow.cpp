@@ -31,8 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Camera Video Data
     connect(&camera, &Camera::onFrame, this, [&](QImage image){
         ui->graphicsView->scene()->clear();
+        ui->graphicsView->scene()->setSceneRect(0, 0, image.width(), image.height());
         ui->graphicsView->scene()->addPixmap(QPixmap::fromImage(image));
-
         cursorGrid.draw(ui->graphicsView->scene());
 
     }, Qt::QueuedConnection);
