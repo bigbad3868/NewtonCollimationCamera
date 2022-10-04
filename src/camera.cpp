@@ -6,22 +6,13 @@
 #include <algorithm>
 
 Camera::Camera(QObject *parent) : CameraInterface(parent)
-{
-    return;
-    auto availableCameras = AsiCameraInfo::availableCameras();
-    if (availableCameras.size() == 0)
-    {
-        qWarning("No camera found!");
-        return;
-    }
-
-}
+{ }
 
 Camera::~Camera()
 {
     Camera::stop();
     mAsiCamera.close();
- }
+}
 
 bool Camera::start()
 {
