@@ -40,7 +40,6 @@ signals:
 
 protected:
     std::atomic<bool> mRunning {false};
-    std::vector<unsigned char> mFrameBuffer;
     int mExposure {0};
     int mGain {0};
     int mWidth {0};

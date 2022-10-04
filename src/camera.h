@@ -11,6 +11,8 @@
 #include "camerainterface.h"
 
 #include <QThreadPool>
+#include <vector>
+#include <QSharedPointer>
 
 class Camera : public CameraInterface
 {
@@ -36,6 +38,9 @@ public:
 
 protected:
     QThreadPool mGetVideoDataWorker;
+    QSharedPointer<std::vector<unsigned char>> mFrameBuffer;
+    QImage mFrameImage;
+
     AsiCamera mAsiCamera;
 };
 

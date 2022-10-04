@@ -33,12 +33,13 @@ bool Camera::start()
     mGetVideoDataWorker.start([this](){
         while (isRunning())
         {
-            if (mAsiCamera.getVideoData(mFrameBuffer.data(), mFrameBuffer.size()) == false)
+            if (mAsiCamera.getVideoData(mFrameBuffer->data(), mFrameBuffer->size()) == false)
             {
                 stop();
                 return;
             }
-            emit this->onFrame(QImage(mFrameBuffer.data(), mWidth, mHeight, mFormat));
+
+            emit this->onFrame(mFrameImage);
         }
     });
 
@@ -97,14 +98,14 @@ static std::string joinAsString(const T &arg, const std::string &separator = ", 
 
 bool Camera::setCamera(const AsiCameraInfo &cameraInfo)
 {
+    stop();
+    mAsiCamera.close();
+
     mWidth = cameraInfo.maxWidth();
     mHeight = cameraInfo.maxHeight();
     // const auto bitDepth = cameraInfo.bitDepth();
     // const auto byteDepth = (bitDepth + 7) / 8;
 
-    stop();
-
-    mAsiCamera.close();
     mAsiCamera.setCamera(cameraInfo);
     mAsiCamera.open();
 
@@ -112,14 +113,18 @@ bool Camera::setCamera(const AsiCameraInfo &cameraInfo)
     {
         mAsiCamera.setImageFormat(AsiCamera::ImageFormat::ImageFormatRgb24);
         mFormat = QImage::Format::Format_BGR888;
-        mFrameBuffer.resize(mWidth * mHeight * 3);
+        mFrameBuffer.reset(new std::vector<unsigned char>(mWidth * mHeight * 3));
     }
     else
     {
         mAsiCamera.setImageFormat(AsiCamera::ImageFormat::ImageFormatY8);
         mFormat = QImage::Format::Format_Grayscale8;
-        mFrameBuffer.resize(mWidth * mHeight * 1);
+        mFrameBuffer.reset(new std::vector<unsigned char>(mWidth * mHeight * 1));
     }
+
+    mFrameImage = QImage(mFrameBuffer->data(), mWidth, mHeight, mFormat, [](void *arg){
+        delete static_cast<QSharedPointer<std::vector<unsigned char>>*>(arg);
+    }, new QSharedPointer<std::vector<unsigned char>>(mFrameBuffer));
 
     CameraInterface::setGain(mAsiCamera.control("Gain"));
     CameraInterface::setExposure(mAsiCamera.control("Exposure"));
