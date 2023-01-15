@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    rotationFinder.moveToThread(&rotationFinderThread);
+    rotationFinderThread.start();
+
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
     ui->graphicsView->viewport()->installEventFilter(this);
@@ -33,9 +36,38 @@ MainWindow::MainWindow(QWidget *parent)
         ui->graphicsView->scene()->clear();
         ui->graphicsView->scene()->setSceneRect(0, 0, image.width(), image.height());
         ui->graphicsView->scene()->addPixmap(QPixmap::fromImage(image));
-        cursorGrid.draw(ui->graphicsView->scene());
+        if (ui->markerCenter->isChecked())
+        {
+            cursorGrid.draw(ui->graphicsView->scene());
+        }
 
     }, Qt::QueuedConnection);
+
+    connect(ui->autoCenter, &QGroupBox::toggled, this, [&](bool checked)
+    {
+        if (checked)
+        {
+            rotationFinder.reset();
+        }
+        else
+        {
+            rotationFinder.stop();
+        }
+    });
+
+    connect(&camera, &Camera::onFrame, &rotationFinder, &RotationFinder::process);
+
+    connect(&rotationFinder, &RotationFinder::completed, this, [&](double quality, double rotation, QPoint centerOfRotation){
+
+        const bool isGood = qAbs(rotation) > 10 && qAbs(rotation) < 90;
+        ui->autoCenterRotation->setText(QString::number(rotation, 'f', 3));
+        ui->autoCenterQuality->setText(QString::number(quality * 100, 'f', 1) + "%");
+        if (isGood)
+        {
+            ui->offsetX->setValue(centerOfRotation.x());
+            ui->offsetY->setValue(centerOfRotation.y());
+        }
+    });
 
     // Sliders / circle
     QList<QPair<QSlider*, QLabel*>> rings = {
@@ -100,6 +132,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    rotationFinderThread.quit();
     settings.setValue("offset/x", cursorGrid.offsetX());
     settings.setValue("offset/y", cursorGrid.offsetY());
     settings.sync();

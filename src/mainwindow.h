@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "camera.h"
 #include "cursorgrid.h"
+#include "rotationfinder.h"
 
 #include <QEvent>
 #include <QSettings>
@@ -31,7 +32,10 @@ private:
 
     Camera camera;
     CursorGrid cursorGrid;
+    RotationFinder rotationFinder;
     QSettings settings;
+
+    QThread rotationFinderThread;
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

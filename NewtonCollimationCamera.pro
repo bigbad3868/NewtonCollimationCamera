@@ -6,6 +6,12 @@ CONFIG += c++14
 
 LIBS += -L3rdparty/1.17/lib/x64/ -lASICamera2
 
+# add open CV
+unix {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += opencv4
+}
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -13,6 +19,7 @@ LIBS += -L3rdparty/1.17/lib/x64/ -lASICamera2
 INCLUDEPATH += 3rdparty/1.17/include/ asicamera/
 
 SOURCES += \
+    src/rotationfinder.cpp \
     src/camera.cpp \
     src/camerainterface.cpp \
     src/cursorgrid.cpp \
@@ -24,6 +31,7 @@ SOURCES += \
     asicamera/asicamerainfo.cpp \
 
 HEADERS += \
+    src/rotationfinder.h \
     src/camera.h \
     src/camerainterface.h \
     src/cursorgrid.h \
