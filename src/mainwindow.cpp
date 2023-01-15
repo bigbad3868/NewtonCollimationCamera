@@ -128,6 +128,24 @@ MainWindow::MainWindow(QWidget *parent)
         ui->cameraName->blockSignals(false);
     });
     ui->cameraNameRefresh->click(); // ;)
+
+
+    // INDI
+    QObject::connect(ui->indiConnect, &QPushButton::clicked, this, [&]
+    {
+        indiClient.setServer(ui->indiAddress->text().toLatin1().data(), 7624);
+        indiClient.connectServer();
+    });
+
+    QObject::connect(&indiRotator, &INDIRotator::angleChanged, this, [&]
+    {
+        ui->indiFalconAnglePreview->setText(QString::number(indiRotator.angle()));
+    });
+
+    QObject::connect(ui->indiFalconAngle, qOverload<double>(&QDoubleSpinBox::valueChanged), this, [&](double value)
+    {
+        indiRotator.setAngle(value);
+    });
 }
 
 MainWindow::~MainWindow()

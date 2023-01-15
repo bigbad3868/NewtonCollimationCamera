@@ -6,6 +6,9 @@
 #include "cursorgrid.h"
 #include "rotationfinder.h"
 
+#include <libindi/baseclient.h>
+#include "indirotator.h"
+
 #include <QEvent>
 #include <QSettings>
 
@@ -34,6 +37,9 @@ private:
     CursorGrid cursorGrid;
     RotationFinder rotationFinder;
     QSettings settings;
+
+    INDI::BaseClient indiClient;
+    INDIRotator indiRotator{&indiClient};
 
     QThread rotationFinderThread;
 

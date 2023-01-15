@@ -5,6 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++14
 
 LIBS += -L3rdparty/1.17/lib/x64/ -lASICamera2
+LIBS += -lindiclient
 
 # add open CV
 unix {
@@ -19,6 +20,7 @@ unix {
 INCLUDEPATH += 3rdparty/1.17/include/ asicamera/
 
 SOURCES += \
+    src/indirotator.cpp \
     src/rotationfinder.cpp \
     src/camera.cpp \
     src/camerainterface.cpp \
@@ -31,6 +33,7 @@ SOURCES += \
     asicamera/asicamerainfo.cpp \
 
 HEADERS += \
+    src/indirotator.h \
     src/rotationfinder.h \
     src/camera.h \
     src/camerainterface.h \
